@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./Routes/authRoutes');
 const productRouter = require('./Routes/productRoutes');
 const adminRouter = require('./Routes/adminRoutes');
+const checkoutRouter = require('./Routes/checkout');
 
 // 5000
 
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRouter);
 app.use('/api/products', productRouter);
+app.use('/api/checkout', checkoutRouter);
 
 const PORT = process.env.PORT || 5000;
 const URI = process.env.ATLAS_URI;
