@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./Routes/authRoutes');
 const productRouter = require('./Routes/productRoutes');
 const adminRouter = require('./Routes/adminRoutes');
+const checkoutRouter = require('./Routes/checkoutRouter');
+const userRouter = require('./Routes/userRouter');
 
 // 5000
 
@@ -19,9 +21,18 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// auth : reguster - login - loginwithtoken - xong 2 buoc - login duoi quyen user (customer)
 app.use('/api/auth', authRoutes);
+
 app.use('/api/admin', adminRouter);
+
 app.use('/api/products', productRouter);
+
+app.use('/api/checkout', checkoutRouter);
+
+
+// user (customer)
+app.use('/api/user', userRouter);
 
 const PORT = process.env.PORT || 5000;
 const URI = process.env.ATLAS_URI;
