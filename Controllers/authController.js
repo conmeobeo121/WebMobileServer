@@ -2,7 +2,8 @@ const userModel = require('../Models/userModel');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const checkout = require('../Routes/authRoutes');
+const Checkout = require('../Models/checkOut');
+
 const createToken = (_id, role) => {
     const jwtKey = process.env.JWT_SECRET_KEY;
     return jwt.sign({ _id: _id, role: role }, jwtKey, { expiresIn: '1h' });
@@ -83,7 +84,7 @@ const loginUserGetData = async (req, res) => {
         res.cookie("accessToken", token);
 
         // Fetch checkout data
-        const checkoutData = await checkout.aggregate([
+        const checkoutData = await Checkout.aggregate([
             {
                 $unwind: '$products'
             },
