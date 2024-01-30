@@ -57,3 +57,91 @@ const getAllCheckouts = async (req, res) => {
 
 
 module.exports = { getCheckOut, getAllCheckouts };
+
+const handleLogin = async () => {
+    try {
+        let response = await postData('/auth/login', { email, password });
+        console.log('Server Response:', response);
+
+        if (response.token && response.role) {
+            setToken(response, response.token, response.role);
+
+            console.log('Token:', response.token);
+            console.log('User:', response);
+
+            if (response.role === ROLES.ADMIN) {
+                navigate('/admin');
+            } else if (response.role === ROLES.CUSTOMER) {
+                navigate('/customer');
+            }
+        } else {
+            console.error('Token or role is missing in the server response.');
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error('Email or password is incorrect.', {
+            position: 'top-right',
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+        });
+    }
+};
+const getCheckout_Total = async (req, res) => {
+    try {
+        const checkoutData = await Checkout.aggregate([
+            {
+                $unwind: '$products'
+            },
+            {
+                $group: {
+                    _id: '$products.product',
+                    title: { $first: '$products.name' },
+                    totalQuantity: { $sum: '$products.quantity' },
+                    totalAmount: { $sum: '$products.price' },
+                    startTime: { $min: '$createdAt' },  // Include the start time
+                    endTime: { $max: '$createdAt' }      // Include the end time
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    title: 1,
+                    totalQuantity: 1,
+                    totalAmount: 1,
+                    startTime: 1,
+                    endTime: 1
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAllQuantity: { $sum: '$totalQuantity' },
+                    totalAllAmount: { $sum: '$totalAmount' },
+                    startTime: { $min: '$startTime' },  // Include the overall start time
+                    endTime: { $max: '$endTime' }      // Include the overall end time
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    totalAllQuantity: 1,
+                    totalAllAmount: 1,
+                    startTime: 1,
+                    endTime: 1
+                }
+            }
+        ]);
+
+        res.status(200).json({ success: true, checkoutData });
+    } catch (error) {
+        console.error('Error fetching checkout data:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+module.exports = { getCheckOut, getAllCheckouts, getCheckout_Total };

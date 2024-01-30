@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../Models/userModel');
 const authenticateUser = require('../middleware/authMiddleware');
 const checkRoleMiddleware = require('../middleware/checkRoleMiddleware');
-const { getCheckOut } = require('../Controllers/checkoutController');
+const { getCheckOut, getCheckout_Total } = require('../Controllers/checkoutController');
 
 const {
     getAllProducts,
@@ -34,6 +34,8 @@ router.get('/profile', authenticateUser, checkRoleMiddleware('customer'), (req, 
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+router.get('/checkout', checkRoleMiddleware('customer'), getCheckout_Total);
 
 router.post('/', getCheckOut);
 
